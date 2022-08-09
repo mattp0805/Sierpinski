@@ -19,6 +19,7 @@ var points = [];
 //adjustable globals
 
 const lineWidth = 1;
+const timeBetweenDots = 1;
 
 while (maxL > h) {
     maxL = maxL - shrink;
@@ -115,6 +116,7 @@ function chaosGame(r, startX, startY) {
     let currentPoint = { x: startX, y: startY };
     let destination = {x: 0, y: 0};
     let halfway = null;
+     
     while (count < r) {
         let vertex = Math.floor(Math.random() * 3) + 1;
         console.log(vertex);
@@ -134,12 +136,24 @@ function chaosGame(r, startX, startY) {
             }
         halfway = findHalfway(currentPoint, destination);
         points.push(halfway);
-        drawDot(halfway.x,halfway.y);
         currentPoint = halfway;
         count++;
+    }
+}
+
+function drawChaosGame(){
+    let introTime = 0;
+    for (let i = 0; i < points.length; i++) {
+        introTime += timeBetweenDots;
+        console.log(points[i]);
+        setTimeout(function(point){
+            drawDot(point.x, point.y);
+        }, introTime, points[i]);
+        
     }
 }
 let startCoords = randomPoint();
 console.log("start coords: " + startCoords);
 drawTriangle();
-chaosGame(100000, startCoords.x, startCoords.y);
+chaosGame(1000, startCoords.x, startCoords.y);
+drawChaosGame();
