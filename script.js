@@ -16,10 +16,13 @@ canvas.width = w;
 var cx = w / 2;
 var cy = h / 2;
 var points = [];
-//adjustable globals
 
-const lineWidth = 1;
+
+//adjustable globals
+let triLineWidth = 1;
+let dotLineWidth = 1;
 const timeBetweenDots = 2;
+let dotColor = "#0d576c";
 
 while (maxL > h) {
     maxL = maxL - shrink;
@@ -47,15 +50,15 @@ triangle.y3 = triangle.y2 - R;
 
 function drawDot(dotX, dotY) {
     ctx.beginPath();
-    ctx.lineWidth = 5;
-    ctx.fillStyle = "red";
-    ctx.arc(dotX, dotY, lineWidth, 0, Math.PI * 2, true);
+    ctx.fillStyle = dotColor;
+    ctx.arc(dotX, dotY, dotLineWidth, 0, Math.PI * 2, true);
     ctx.fill();
 }
 
 function drawTriangle() {
     ctx.beginPath();
-    ctx.strokeStyle = "red";
+    ctx.lineWidth = triLineWidth;
+    ctx.strokeStyle = dotColor;
     ctx.moveTo(triangle.x1, triangle.y1);
     ctx.lineTo(triangle.x2, triangle.y2);
     ctx.lineTo(triangle.x3, triangle.y3);
@@ -88,7 +91,6 @@ function randomPoint() {
         }
     }
     var coords = { x: x, y: y };
-    console.log(coords.x, coords.y);
     return coords;
 }
 
@@ -116,7 +118,6 @@ function chaosGame(r, startX, startY) {
 
     while (count < r) {
         let vertex = Math.floor(Math.random() * 3) + 1;
-        console.log(vertex);
         switch (vertex) {
             case 1:
                 destination.x = triangle.x1;
@@ -142,7 +143,6 @@ function drawChaosGame() {
     let introTime = 0;
     for (let i = 0; i < points.length; i++) {
         introTime += timeBetweenDots;
-        console.log(points[i]);
 
         setTimeout(
             function (point) {
@@ -153,8 +153,21 @@ function drawChaosGame() {
         );
     }
 }
+
+function resetCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawTriangle();
+}
+
+resetCanvas();
 let startCoords = randomPoint();
-console.log("start coords: " + startCoords);
 drawTriangle();
-chaosGame(100000, startCoords.x, startCoords.y);
-drawChaosGame();
+document.getElementsByClassName("panel-item start")[0].addEventListener("click", function(){
+    resetCanvas();
+    console.log("Start button clicked");
+    let iterations = parseInt(document.querySelector("input").value);
+    chaosGame(iterations, startCoords.x, startCoords.y);
+    drawChaosGame();
+    console.log(iterations + "Iterations Completed");
+}
+);

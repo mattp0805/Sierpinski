@@ -1,11 +1,30 @@
 canvas {
     display: block;
-    background-color: black;
+    background-color: #c5c9fa;
     position: absolute;
     top: 0;
     bottom: 0;
+    left: 0;
+    right:0;
 }
 
-button {
-    display: none;
+.panel-item {
+    z-index: 1;
+    color: #6968db;
+    display: block;
+    position: relative;
+    margin: 20px 40px;
+    padding: 20px 30px;
+    width: 150px;
+    font-weight: bolder;
+    font-size: 18pt;
+    background-color: #e9b0f5;
+    border: 0 ;
+    font-family: Helvetica, Arial, sans-serif;
+    text-transform: uppercase;
+    border: 2px solid #6968db;
+    box-sizing: border-box;
+
+
+
 }
