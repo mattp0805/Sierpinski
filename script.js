@@ -19,7 +19,7 @@ var points = [];
 //adjustable globals
 
 const lineWidth = 1;
-const timeBetweenDots = 1;
+const timeBetweenDots = 2;
 
 while (maxL > h) {
     maxL = maxL - shrink;
@@ -92,36 +92,33 @@ function randomPoint() {
     return coords;
 }
 
-function findHalfway(currentPoint,destination){
-    let halfwayPoint = {x:0,y:0};
-    if (currentPoint.x < destination.x){
-        halfwayPoint.x = currentPoint.x + (destination.x - currentPoint.x)/2;
-        
+function findHalfway(currentPoint, destination) {
+    let halfwayPoint = { x: 0, y: 0 };
+    if (currentPoint.x < destination.x) {
+        halfwayPoint.x = currentPoint.x + (destination.x - currentPoint.x) / 2;
     } else {
-        halfwayPoint.x = currentPoint.x - (currentPoint.x - destination.x)/2;
-    }; 
-    
-    if (currentPoint.y < destination.y){
-        halfwayPoint.y = currentPoint.y + (destination.y - currentPoint.y)/2;
+        halfwayPoint.x = currentPoint.x - (currentPoint.x - destination.x) / 2;
+    }
+
+    if (currentPoint.y < destination.y) {
+        halfwayPoint.y = currentPoint.y + (destination.y - currentPoint.y) / 2;
     } else {
-
-        halfwayPoint.y = currentPoint.y - (currentPoint.y - destination.y)/2;
-    };
-return halfwayPoint;
-
+        halfwayPoint.y = currentPoint.y - (currentPoint.y - destination.y) / 2;
+    }
+    return halfwayPoint;
 }
 
 function chaosGame(r, startX, startY) {
     let count = 0;
     let currentPoint = { x: startX, y: startY };
-    let destination = {x: 0, y: 0};
+    let destination = { x: 0, y: 0 };
     let halfway = null;
-     
+
     while (count < r) {
         let vertex = Math.floor(Math.random() * 3) + 1;
         console.log(vertex);
-        switch(vertex){
-            case 1: 
+        switch (vertex) {
+            case 1:
                 destination.x = triangle.x1;
                 destination.y = triangle.y1;
                 break;
@@ -133,7 +130,7 @@ function chaosGame(r, startX, startY) {
                 destination.x = triangle.x3;
                 destination.y = triangle.y3;
                 break;
-            }
+        }
         halfway = findHalfway(currentPoint, destination);
         points.push(halfway);
         currentPoint = halfway;
@@ -141,19 +138,23 @@ function chaosGame(r, startX, startY) {
     }
 }
 
-function drawChaosGame(){
+function drawChaosGame() {
     let introTime = 0;
     for (let i = 0; i < points.length; i++) {
         introTime += timeBetweenDots;
         console.log(points[i]);
-        setTimeout(function(point){
-            drawDot(point.x, point.y);
-        }, introTime, points[i]);
-        
+
+        setTimeout(
+            function (point) {
+                drawDot(point.x, point.y);
+            },
+            introTime,
+            points[i]
+        );
     }
 }
 let startCoords = randomPoint();
 console.log("start coords: " + startCoords);
 drawTriangle();
-chaosGame(1000, startCoords.x, startCoords.y);
+chaosGame(100000, startCoords.x, startCoords.y);
 drawChaosGame();
