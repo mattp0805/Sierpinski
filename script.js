@@ -2,7 +2,8 @@
 
 console.log("start");
 //declare globals
-const canvas = document.getElementById("c")
+const canvas = document.getElementById("c"), scale = document.getElementById("scale");
+
 const ctx = canvas.getContext("2d");
 var points = [];
 var currPoint = null;
