@@ -139,9 +139,14 @@ function chaosGame(r, startX, startY) {
     }
 }
 
-function drawChaosGame() {
+function drawChaosGame(delay) {
     let introTime = 0;
     for (let i = 0; i < points.length; i++) {
+        
+        if (delay){
+            
+        }
+        
         introTime += timeBetweenDots;
 
         setTimeout(
@@ -160,6 +165,16 @@ function resetCanvas() {
 }
 
 resetCanvas();
+console.log(window);
+window.addEventListener('resize', function(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    drawChaosGame(){
+
+    }
+
+})
+
 let startCoords = randomPoint();
 drawTriangle();
 document.getElementsByClassName("panel-item start")[0].addEventListener("click", function(){
