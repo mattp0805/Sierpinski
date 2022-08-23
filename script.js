@@ -1,4 +1,4 @@
-class triangle{
+class sierpinskiTriangle{
 
     constructor(){
             this.width = window.innerWidth;
@@ -15,7 +15,7 @@ class triangle{
 
     }
 
-    setTriangle(){
+    #setTriangle(){
         const cx = this.width / 2;
         const cy = this.height / 2;
         let shrink = 0.2;
@@ -129,7 +129,7 @@ let dotLineWidth = 1;
 const timeBetweenDots = 0;
 let dotColor = "#0d576c";
 
-function drawChaosGame(delay) {
+function drawPoints(delay) {
     let introTime = 0;
     let point; 
     for (let i = 0; i < points.length; i++) {
@@ -150,7 +150,7 @@ function drawChaosGame(delay) {
         //);
         
     }
-        
+
 function resetCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     setTriangle();
