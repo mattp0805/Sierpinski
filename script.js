@@ -151,6 +151,17 @@ function drawPoints(delay) {
         
     }
 
+    function drawTriangle() {
+        ctx.beginPath();
+        ctx.lineWidth = triLineWidth;
+        ctx.strokeStyle = dotColor;
+        ctx.moveTo(triangle.x1, triangle.y1);
+        ctx.lineTo(triangle.x2, triangle.y2);
+        ctx.lineTo(triangle.x3, triangle.y3);
+        ctx.lineTo(triangle.x1, triangle.y1);
+        ctx.stroke();
+        ctx.closePath();
+    }
 function resetCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     setTriangle();
