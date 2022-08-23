@@ -129,30 +129,6 @@ let dotLineWidth = 1;
 const timeBetweenDots = 0;
 let dotColor = "#0d576c";
 
-window.addEventListener('resize', function(){
-    
-    let point = {x: 0, y: 0};
-    for (let i = 0; i < points.length; i++ ){
-        console.log(point.x + ' ' + point.y);
-        point[i] = transformPoint(point[i], window.innerWidth,window.innerHeight);
-    }
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    resetCanvas();
-    setTriangle();
-    drawTriangle();
-    drawChaosGame();
-    console.log('resize');
-})
-
-function transformPoint(point = {x:0, y:0},newWindowWidth,newWindowHeight){
-
-    let newPoint ={x: 0,y:0};
-    newPoint.x = (point.x * newWindowWidth) / w;
-    newPoint.y = (point.y * newWindowHeight) / h;
-    return newPoint;
-}
-
 function drawChaosGame(delay) {
     let introTime = 0;
     let point; 
@@ -174,7 +150,7 @@ function drawChaosGame(delay) {
         //);
         
     }
-    
+        
 function resetCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     setTriangle();
