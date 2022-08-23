@@ -1,37 +1,28 @@
+class triangle{
+
+    constructor(){
+            this.width = width;
+            this.height = height;
+
+    }
+}
+
 //window.CP.PenTimer.MAX_TIME_IN_LOOP_WO_EXIT = 6000;
 
 console.log("start");
 //declare globals
-const canvas = document.getElementById("c");
+const canvas = document.getElementById("c"), scale = document.getElementById("scale");
+
 const ctx = canvas.getContext("2d");
 var points = [];
 var currPoint = null;
-var w = window.innerWidth;
-var h = window.innerHeight;
-let L = 0;
-let shrink = 0.2;
-let maxL = w;
+let w = window.innerWidth;
+let h = window.innerHeight;
 canvas.height = h;
 canvas.width = w;
 var cx = w / 2;
 var cy = h / 2;
 var points = [];
-
-
-//adjustable globals
-let triLineWidth = 1;
-let dotLineWidth = 1;
-const timeBetweenDots = 2;
-let dotColor = "#0d576c";
-
-while (maxL > h) {
-    maxL = maxL - shrink;
-    shrink += 0.05;
-}
-L = maxL;
-// R = height of triangle
-const R = (L * Math.sqrt(3)) / 2;
-
 let triangle = {
     x1: 0,
     x2: 0,
@@ -40,19 +31,61 @@ let triangle = {
     y2: 0,
     y3: 0
 };
-//define triangle
-triangle.x1 = cx - L / 2;
-triangle.y1 = cy + R / 2;
-triangle.x2 = triangle.x1 + L;
-triangle.y2 = triangle.y1;
-triangle.x3 = cx;
-triangle.y3 = triangle.y2 - R;
 
-function drawDot(dotX, dotY) {
-    ctx.beginPath();
-    ctx.fillStyle = dotColor;
-    ctx.arc(dotX, dotY, dotLineWidth, 0, Math.PI * 2, true);
-    ctx.fill();
+
+//adjustable globals
+let triLineWidth = 1;
+let dotLineWidth = 1;
+const timeBetweenDots = 0;
+let dotColor = "#0d576c";
+
+window.addEventListener('resize', function(){
+    
+    let point = {x: 0, y: 0};
+    for (let i = 0; i < points.length; i++ ){
+        console.log(point.x + ' ' + point.y);
+        point[i] = transformPoint(point[i], window.innerWidth,window.innerHeight);
+    }
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    resetCanvas();
+    setTriangle();
+    drawTriangle();
+    drawChaosGame();
+    console.log('resize');
+})
+
+function transformPoint(point = {x:0, y:0},newWindowWidth,newWindowHeight){
+
+    let newPoint ={x: 0,y:0};
+    newPoint.x = (point.x * newWindowWidth) / w;
+    newPoint.y = (point.y * newWindowHeight) / h;
+    return newPoint;
+}
+
+function setTriangle(){
+    w = window.innerWidth;
+    h = window.innerHeight;
+    cx = w / 2;
+    cy = h / 2;
+    let shrink = 0.2;
+    let maxL = w;
+    while (maxL > h) {
+        maxL = maxL - shrink;
+        shrink += 0.05;
+    }
+    let L = maxL;
+    
+    // R = height of triangle
+    let R = (L * Math.sqrt(3)) / 2;
+
+    //define triangle
+    triangle.x1 = cx - L / 2;
+    triangle.y1 = cy + R / 2;
+    triangle.x2 = triangle.x1 + L;
+    triangle.y2 = triangle.y1;
+    triangle.x3 = cx;
+    triangle.y3 = triangle.y2 - R;  
 }
 
 function drawTriangle() {
@@ -66,6 +99,7 @@ function drawTriangle() {
     ctx.stroke();
     ctx.closePath();
 }
+
 function randomPoint() {
     var valid = false;
     const minX = triangle.x1;
@@ -139,28 +173,40 @@ function chaosGame(r, startX, startY) {
     }
 }
 
-function drawChaosGame() {
+function drawChaosGame(delay) {
     let introTime = 0;
+    let point; 
     for (let i = 0; i < points.length; i++) {
+        point = points[i];        
         introTime += timeBetweenDots;
 
-        setTimeout(
-            function (point) {
-                drawDot(point.x, point.y);
-            },
-            introTime,
-            points[i]
-        );
+       // setTimeout(
+         //   function (point) {
+                ctx.beginPath();
+                ctx.fillStyle = dotColor;
+                ctx.arc(point.x, point.y, dotLineWidth, 0, Math.PI * 2, true);
+                ctx.fill();
+                //ctx.fill();
+            }
+           
+            // introTime,
+           // points[i]
+        //);
+        
     }
-}
-
+    
 function resetCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setTriangle();
     drawTriangle();
 }
 
 resetCanvas();
+
+
+
 let startCoords = randomPoint();
+setTriangle();
 drawTriangle();
 document.getElementsByClassName("panel-item start")[0].addEventListener("click", function(){
     resetCanvas();
