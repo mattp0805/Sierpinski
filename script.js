@@ -135,7 +135,15 @@ class SierpinskiTriangle {
     console.log("triangledrawn");
   }
 
+  #drawDot(point) {
+    this.#context.beginPath();
+    this.#context.fillStyle = this.#dotColor;
+    this.#context.arc(point.x, point.y, this.#dotWidth, 0, Math.PI * 2, true);
+    this.#context.fill();
+  }
+
   startChaosGame(draw = true, delay = this.#timeBetweenDots) {
+    console.log("started game");
     let r = parseInt(document.querySelector("input").value);
     let startCoords = this.#randomPoint();
     let count = 0;
@@ -179,12 +187,7 @@ class SierpinskiTriangle {
       count++;
     }
   }
-  #drawDot(point) {
-    this.#context.beginPath();
-    this.#context.fillStyle = this.#dotColor;
-    this.#context.arc(point.x, point.y, this.#dotWidth, 0, Math.PI * 2, true);
-    this.#context.fill();
-  }
+
   resetCanvas(drawTriangle = true) {
     this.#context.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
     this.#setTriangle();
@@ -204,5 +207,4 @@ document
     st.resetCanvas();
     console.log("Start button clicked");
     st.startChaosGame();
-    console.log(finished);
   });
