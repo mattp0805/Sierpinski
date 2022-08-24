@@ -1,173 +1,208 @@
-//window.CP.PenTimer.MAX_TIME_IN_LOOP_WO_EXIT = 6000;
+class SierpinskiTriangle {
+  #canvas; // set  get
+  #context; // set get
+  #points; // set get
+  #canvasBgColor; // set get
+  #triangleColor;
+  #dotColor; // set get
+  #triangleLineWidth; // set get
+  #dotWidth; //set get
+  #timeBetweenDots; //set get
+  #dotsDrawn = false;
+  #triangleDrawn = false;
 
-console.log("start");
-//declare globals
-const canvas = document.getElementById("c");
-const ctx = canvas.getContext("2d");
-var points = [];
-var currPoint = null;
-var w = window.innerWidth;
-var h = window.innerHeight;
-let L = 0;
-let shrink = 0.2;
-let maxL = w;
-canvas.height = h;
-canvas.width = w;
-var cx = w / 2;
-var cy = h / 2;
-var points = [];
+  constructor(
+    canvasId = "c",
+    drawTriangleOnLoad = true,
+    startChaosGameOnLoad = false,
+    fullscreen = true //,
+    //   canvas = document.getElementById("c"),
+    //   canvasBgColor = "#c5c9fa",
+    //   triangleLineWidth = 1,
+    //   dotColor = "#0d576c",
+    //   dotWidth = 1,
+    //   timeBetweenDots = 0
+  ) {
+    this.#canvas = document.getElementById(canvasId);
+    this.#canvasBgColor = "#c5c9fa";
+    this.#canvas.style.backgroundColor = "#c5c9fa";
+    this.#triangleLineWidth = 2;
+    this.#triangleColor = "#0d576c";
+    this.#dotColor = "#0d576c";
+    this.#dotWidth = 1;
+    this.#timeBetweenDots = 5;
+    this.#context = this.#canvas.getContext("2d");
 
+    this.#points = [];
+    this.vertices = {
+      x1: 0,
+      y1: 0,
+      x2: 0,
+      y2: 0,
+      x3: 0,
+      y3: 0,
+    };
 
-//adjustable globals
-let triLineWidth = 1;
-let dotLineWidth = 1;
-const timeBetweenDots = 2;
-let dotColor = "#0d576c";
+    if (fullscreen) {
+      this.#canvas.width = window.innerWidth;
+      this.#canvas.height = window.innerHeight;
+    }
+    if (drawTriangleOnLoad) {
+      this.#setTriangle();
+      this.#drawTriangle();
+    }
+    if (startChaosGameOnLoad) {
+      this.startChaosGame();
+    }
+  }
 
-while (maxL > h) {
-    maxL = maxL - shrink;
-    shrink += 0.05;
-}
-L = maxL;
-// R = height of triangle
-const R = (L * Math.sqrt(3)) / 2;
+  #setTriangle() {
+    const cx = this.#canvas.width / 2;
+    const cy = this.#canvas.height / 2;
+    let shrink = 0.2;
+    let maxL = this.#canvas.width;
+    while (maxL > this.#canvas.height) {
+      maxL = maxL - shrink;
+      shrink += 0.05;
+    }
+    const L = maxL;
+    // R = height of triangle
+    const R = (L * Math.sqrt(3)) / 2;
 
-let triangle = {
-    x1: 0,
-    x2: 0,
-    x3: 0,
-    y1: 0,
-    y2: 0,
-    y3: 0
-};
-//define triangle
-triangle.x1 = cx - L / 2;
-triangle.y1 = cy + R / 2;
-triangle.x2 = triangle.x1 + L;
-triangle.y2 = triangle.y1;
-triangle.x3 = cx;
-triangle.y3 = triangle.y2 - R;
+    //define triangle
+    this.vertices.x1 = cx - L / 2;
+    this.vertices.y1 = cy + R / 2;
+    this.vertices.x2 = this.vertices.x1 + L;
+    this.vertices.y2 = this.vertices.y1;
+    this.vertices.x3 = cx;
+    this.vertices.y3 = this.vertices.y2 - R;
+  }
 
-function drawDot(dotX, dotY) {
-    ctx.beginPath();
-    ctx.fillStyle = dotColor;
-    ctx.arc(dotX, dotY, dotLineWidth, 0, Math.PI * 2, true);
-    ctx.fill();
-}
-
-function drawTriangle() {
-    ctx.beginPath();
-    ctx.lineWidth = triLineWidth;
-    ctx.strokeStyle = dotColor;
-    ctx.moveTo(triangle.x1, triangle.y1);
-    ctx.lineTo(triangle.x2, triangle.y2);
-    ctx.lineTo(triangle.x3, triangle.y3);
-    ctx.lineTo(triangle.x1, triangle.y1);
-    ctx.stroke();
-    ctx.closePath();
-}
-function randomPoint() {
+  #randomPoint(cx) {
     var valid = false;
-    const minX = triangle.x1;
-    const maxX = triangle.x2;
-    const minY = triangle.y1;
+    const minX = this.vertices.x1;
+    const maxX = this.vertices.x2;
+    const minY = this.vertices.y1;
     let y = 0;
     let x = Math.random() * (maxX - minX) + minX;
     let leftOrRight = "l";
-    if (x > cx) {
-        leftOrRight = "r";
+    if (x > this.#canvas.width / 2) {
+      leftOrRight = "r";
     }
     let maxY = 0;
     if (leftOrRight == "l") {
-        maxY = minY - (x - minX) * Math.tan(Math.PI / 3);
+      maxY = minY - (x - minX) * Math.tan(Math.PI / 3);
     } else {
-        maxY = minY - (maxX - x) * Math.tan(Math.PI / 3);
+      maxY = minY - (maxX - x) * Math.tan(Math.PI / 3);
     }
 
     while (valid == false) {
-        y = Math.random() * (minY - maxY) + maxY;
-        if (y > maxY) {
-            valid = true;
-        }
+      y = Math.random() * (minY - maxY) + maxY;
+      if (y > maxY) {
+        valid = true;
+      }
     }
     var coords = { x: x, y: y };
     return coords;
-}
+  }
 
-function findHalfway(currentPoint, destination) {
+  #findHalfway(currentPoint, destination) {
     let halfwayPoint = { x: 0, y: 0 };
     if (currentPoint.x < destination.x) {
-        halfwayPoint.x = currentPoint.x + (destination.x - currentPoint.x) / 2;
+      halfwayPoint.x = currentPoint.x + (destination.x - currentPoint.x) / 2;
     } else {
-        halfwayPoint.x = currentPoint.x - (currentPoint.x - destination.x) / 2;
+      halfwayPoint.x = currentPoint.x - (currentPoint.x - destination.x) / 2;
     }
 
     if (currentPoint.y < destination.y) {
-        halfwayPoint.y = currentPoint.y + (destination.y - currentPoint.y) / 2;
+      halfwayPoint.y = currentPoint.y + (destination.y - currentPoint.y) / 2;
     } else {
-        halfwayPoint.y = currentPoint.y - (currentPoint.y - destination.y) / 2;
+      halfwayPoint.y = currentPoint.y - (currentPoint.y - destination.y) / 2;
     }
     return halfwayPoint;
-}
+  }
 
-function chaosGame(r, startX, startY) {
+  #drawTriangle() {
+    this.#context.beginPath();
+    this.#context.lineWidth = this.#triangleLineWidth;
+    this.#context.strokeStyle = this.#triangleColor;
+    this.#context.moveTo(this.vertices.x1, this.vertices.y1);
+    this.#context.lineTo(this.vertices.x2, this.vertices.y2);
+    this.#context.lineTo(this.vertices.x3, this.vertices.y3);
+    this.#context.lineTo(this.vertices.x1, this.vertices.y1);
+    this.#context.stroke();
+    this.#context.closePath();
+    console.log("triangledrawn");
+  }
+
+  startChaosGame(draw = true, delay = this.#timeBetweenDots) {
+    let r = parseInt(document.querySelector("input").value);
+    let startCoords = this.#randomPoint();
     let count = 0;
-    let currentPoint = { x: startX, y: startY };
+    let currentPoint = { x: startCoords.x, y: startCoords.y };
     let destination = { x: 0, y: 0 };
     let halfway = null;
-
+    if (draw) {
+      var introTime = 0;
+    }
     while (count < r) {
-        let vertex = Math.floor(Math.random() * 3) + 1;
-        switch (vertex) {
-            case 1:
-                destination.x = triangle.x1;
-                destination.y = triangle.y1;
-                break;
-            case 2:
-                destination.x = triangle.x2;
-                destination.y = triangle.y2;
-                break;
-            case 3:
-                destination.x = triangle.x3;
-                destination.y = triangle.y3;
-                break;
-        }
-        halfway = findHalfway(currentPoint, destination);
-        points.push(halfway);
-        currentPoint = halfway;
-        count++;
-    }
-}
+      let vertex = Math.floor(Math.random() * 3) + 1;
+      switch (vertex) {
+        case 1:
+          destination.x = this.vertices.x1;
+          destination.y = this.vertices.y1;
+          break;
+        case 2:
+          destination.x = this.vertices.x2;
+          destination.y = this.vertices.y2;
+          break;
+        case 3:
+          destination.x = this.vertices.x3;
+          destination.y = this.vertices.y3;
+          break;
+      }
+      halfway = this.#findHalfway(currentPoint, destination);
+      this.#points.push(halfway);
+      currentPoint = halfway;
 
-function drawChaosGame() {
-    let introTime = 0;
-    for (let i = 0; i < points.length; i++) {
-        introTime += timeBetweenDots;
-
+      if (draw) {
+        introTime += this.#timeBetweenDots;
+        var that = this;
         setTimeout(
-            function (point) {
-                drawDot(point.x, point.y);
-            },
-            introTime,
-            points[i]
+          function (point) {
+            that.#drawDot(point);
+          },
+          introTime,
+          that.#points[count]
         );
+      }
+      count++;
     }
+  }
+  #drawDot(point) {
+    this.#context.beginPath();
+    this.#context.fillStyle = this.#dotColor;
+    this.#context.arc(point.x, point.y, this.#dotWidth, 0, Math.PI * 2, true);
+    this.#context.fill();
+  }
+  resetCanvas(drawTriangle = true) {
+    this.#context.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
+    this.#setTriangle();
+    if (drawTriangle) {
+      this.#drawTriangle();
+    }
+  }
 }
 
-function resetCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawTriangle();
-}
+console.log("start");
 
-resetCanvas();
-let startCoords = randomPoint();
-drawTriangle();
-document.getElementsByClassName("panel-item start")[0].addEventListener("click", function(){
-    resetCanvas();
+let st = new SierpinskiTriangle();
+
+document
+  .getElementsByClassName("panel-item start")[0]
+  .addEventListener("click", function () {
+    st.resetCanvas();
     console.log("Start button clicked");
-    let iterations = parseInt(document.querySelector("input").value);
-    chaosGame(iterations, startCoords.x, startCoords.y);
-    drawChaosGame();
-    console.log(iterations + "Iterations Completed");
-}
-);
+    st.startChaosGame();
+    console.log(finished);
+  });
