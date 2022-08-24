@@ -1,9 +1,31 @@
 class sierpinskiTriangle{
-
-    constructor(){
-            this.width = window.innerWidth;
-            this.height = window.innerHeight;
-            this.points = [];
+    #canvas; //no set no get
+    #context; // no set no get
+    #points; // no set no get
+    #canvasBgColor; // set get
+    #dotColor; // set get
+    #triangleLineWidth; // set get
+    #dotWidth; //set get
+    #timeBetweenDots; //set get
+    constructor(
+        canvas = document.getElementById("c"), scale = document.getElementById("scale"),
+        canvasBgColor = '#c5c9fa',
+        triangleLineWidth = 1,
+        dotColor = '#0d576c',
+        dotWidth = 1,
+        timeBetweenDots = 0,
+        ){
+            this.#canvas = canvas;
+            this.#canvasBgColor = canvasBgColor;
+            this.#triangleLineWidth = triangleLineWidth;
+            this.#dotColor = dotColor;
+            this.#dotWidth = dotWidth
+            this.#timeBetweenDots = timeBetweenDots;
+            this.#context = this.#canvas.getContext("2d");
+            //adjustable globals
+            this.canvasWidth = window.innerWidth;
+            this.canvasHeight = window.innerHeight;
+            this.#points = [];
             this.vertices = {
                 x1: 0,
                 y1: 0,
@@ -13,14 +35,17 @@ class sierpinskiTriangle{
                 y3: 0
             }
 
+            this.#canvas.width = this.width;
+            this.#canvas.height = this.height;
+
     }
 
     #setTriangle(){
-        const cx = this.width / 2;
-        const cy = this.height / 2;
+        const cx = this.canvasWidth / 2;
+        const cy = this.canvasHeight / 2;
         let shrink = 0.2;
-        let maxL = this.width;
-        while (maxL > this.height) {
+        let maxL = this.canvasWidth;
+        while (maxL > this.canvasHeight) {
             maxL = maxL - shrink;
             shrink += 0.05;
         }
@@ -91,6 +116,7 @@ class sierpinskiTriangle{
         let halfway = null;
     
         while (count < r) {
+            
             let vertex = Math.floor(Math.random() * 3) + 1;
             switch (vertex) {
                 case 1:
@@ -107,49 +133,43 @@ class sierpinskiTriangle{
                     break;
             }
             halfway = findHalfway(currentPoint, destination);
-            points.push(halfway);
+            this.#points.push(halfway);
             currentPoint = halfway;
             count++;
         }
     }
+
+    #drawPoint(delay) {
+        let introTime = 0;
+        let point; 
+        for (let i = 0; i < this.#points.length; i++) {
+            point = this.#points[i];        
+            introTime += timeBetweenDots;
+    
+           // setTimeout(
+             //   function (point) {
+                    ctx.beginPath();
+                    ctx.fillStyle = dotColor;
+                    ctx.arc(point.x, point.y, dotLineWidth, 0, Math.PI * 2, true);
+                    ctx.fill();
+                    //ctx.fill();
+                }
+               
+                // introTime,
+               // points[i]
+            //);
+            
+        }
 }
 
 //window.CP.PenTimer.MAX_TIME_IN_LOOP_WO_EXIT = 6000;
 
 console.log("start");
-//declare globals
-const canvas = document.getElementById("c"), scale = document.getElementById("scale");
-const ctx = canvas.getContext("2d");
-canvas.height = window.innerHeight;
-canvas.width = window.innerWidth;
 
-//adjustable globals
-let triLineWidth = 1;
-let dotLineWidth = 1;
-const timeBetweenDots = 0;
-let dotColor = "#0d576c";
 
-function drawPoints(delay) {
-    let introTime = 0;
-    let point; 
-    for (let i = 0; i < points.length; i++) {
-        point = points[i];        
-        introTime += timeBetweenDots;
 
-       // setTimeout(
-         //   function (point) {
-                ctx.beginPath();
-                ctx.fillStyle = dotColor;
-                ctx.arc(point.x, point.y, dotLineWidth, 0, Math.PI * 2, true);
-                ctx.fill();
-                //ctx.fill();
-            }
-           
-            // introTime,
-           // points[i]
-        //);
-        
-    }
+
+
 
     function drawTriangle() {
         ctx.beginPath();
