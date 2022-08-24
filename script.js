@@ -186,9 +186,9 @@ class SierpinskiTriangle {
     this.#context.fill();
   }
   resetCanvas(drawTriangle = true) {
-    this.#context.clearRect(0, 0, canvas.width, canvas.height);
+    this.#context.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
     this.#setTriangle();
-    if (withTriangle) {
+    if (drawTriangle) {
       this.#drawTriangle();
     }
   }
@@ -201,10 +201,9 @@ let st = new SierpinskiTriangle("c", true, true);
 document
   .getElementsByClassName("panel-item start")[0]
   .addEventListener("click", function () {
-    resetCanvas();
+    st.resetCanvas();
     console.log("Start button clicked");
-    let iterations = parseInt(document.querySelector("input").value);
-    chaosGame(iterations, startCoords.x, startCoords.y);
+    st.startChaosGame();
     drawChaosGame();
     console.log(iterations + "Iterations Completed");
   });
