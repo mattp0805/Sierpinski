@@ -1,31 +1,38 @@
-class sierpinskiTriangle {
-  #canvas; //no set no get
-  #context; // no set no get
-  #points; // no set no get
+class SierpinskiTriangle {
+  #canvas; // set  get
+  #context; // set get
+  #points; // set get
   #canvasBgColor; // set get
+  #triangleColor;
   #dotColor; // set get
   #triangleLineWidth; // set get
   #dotWidth; //set get
   #timeBetweenDots; //set get
+  #dotsDrawn = false;
+  #triangleDrawn = false;
+
   constructor(
-    canvas = document.getElementById("c"),
-    scale = document.getElementById("scale"),
-    canvasBgColor = "#c5c9fa",
-    triangleLineWidth = 1,
-    dotColor = "#0d576c",
-    dotWidth = 1,
-    timeBetweenDots = 0
+    canvasId = "c",
+    drawTriangleOnLoad = true,
+    startChaosGameOnLoad = false,
+    fullscreen = true //,
+    //   canvas = document.getElementById("c"),
+    //   canvasBgColor = "#c5c9fa",
+    //   triangleLineWidth = 1,
+    //   dotColor = "#0d576c",
+    //   dotWidth = 1,
+    //   timeBetweenDots = 0
   ) {
-    this.#canvas = canvas;
-    this.#canvasBgColor = canvasBgColor;
-    this.#triangleLineWidth = triangleLineWidth;
-    this.#dotColor = dotColor;
-    this.#dotWidth = dotWidth;
-    this.#timeBetweenDots = timeBetweenDots;
+    this.#canvas = document.getElementById(canvasId);
+    this.#canvasBgColor = "#c5c9fa";
+    this.#canvas.style.backgroundColor = "#c5c9fa";
+    this.#triangleLineWidth = 2;
+    this.#triangleColor = "#0d576c";
+    this.#dotColor = "#0d576c";
+    this.#dotWidth = 1;
+    this.#timeBetweenDots = 5;
     this.#context = this.#canvas.getContext("2d");
-    //adjustable globals
-    this.canvasWidth = window.innerWidth;
-    this.canvasHeight = window.innerHeight;
+
     this.#points = [];
     this.vertices = {
       x1: 0,
@@ -36,16 +43,25 @@ class sierpinskiTriangle {
       y3: 0,
     };
 
-    this.#canvas.width = this.width;
-    this.#canvas.height = this.height;
+    if (fullscreen) {
+      this.#canvas.width = window.innerWidth;
+      this.#canvas.height = window.innerHeight;
+    }
+    if (drawTriangleOnLoad) {
+      this.#setTriangle();
+      this.#drawTriangle();
+    }
+    if (startChaosGameOnLoad) {
+      this.startChaosGame();
+    }
   }
 
   #setTriangle() {
-    const cx = this.canvasWidth / 2;
-    const cy = this.canvasHeight / 2;
+    const cx = this.#canvas.width / 2;
+    const cy = this.#canvas.height / 2;
     let shrink = 0.2;
-    let maxL = this.canvasWidth;
-    while (maxL > this.canvasHeight) {
+    let maxL = this.#canvas.width;
+    while (maxL > this.#canvas.height) {
       maxL = maxL - shrink;
       shrink += 0.05;
     }
@@ -62,7 +78,7 @@ class sierpinskiTriangle {
     this.vertices.y3 = this.vertices.y2 - R;
   }
 
-  #randomPoint() {
+  #randomPoint(cx) {
     var valid = false;
     const minX = this.vertices.x1;
     const maxX = this.vertices.x2;
@@ -70,7 +86,7 @@ class sierpinskiTriangle {
     let y = 0;
     let x = Math.random() * (maxX - minX) + minX;
     let leftOrRight = "l";
-    if (x > cx) {
+    if (x > this.#canvas.width / 2) {
       leftOrRight = "r";
     }
     let maxY = 0;
@@ -106,13 +122,29 @@ class sierpinskiTriangle {
     return halfwayPoint;
   }
 
-  startChaosGame(r, draw = true, delay = this.#timeBetweenDots) {
+  #drawTriangle() {
+    this.#context.beginPath();
+    this.#context.lineWidth = this.#triangleLineWidth;
+    this.#context.strokeStyle = this.#triangleColor;
+    this.#context.moveTo(this.vertices.x1, this.vertices.y1);
+    this.#context.lineTo(this.vertices.x2, this.vertices.y2);
+    this.#context.lineTo(this.vertices.x3, this.vertices.y3);
+    this.#context.lineTo(this.vertices.x1, this.vertices.y1);
+    this.#context.stroke();
+    this.#context.closePath();
+    console.log("triangledrawn");
+  }
+
+  startChaosGame(draw = true, delay = this.#timeBetweenDots) {
+    let r = parseInt(document.querySelector("input").value);
     let startCoords = this.#randomPoint();
     let count = 0;
     let currentPoint = { x: startCoords.x, y: startCoords.y };
     let destination = { x: 0, y: 0 };
     let halfway = null;
-    let introTime = 0;
+    if (draw) {
+      var introTime = 0;
+    }
     while (count < r) {
       let vertex = Math.floor(Math.random() * 3) + 1;
       switch (vertex) {
@@ -129,52 +161,43 @@ class sierpinskiTriangle {
           destination.y = this.vertices.y3;
           break;
       }
-      halfway = findHalfway(currentPoint, destination);
+      halfway = this.#findHalfway(currentPoint, destination);
       this.#points.push(halfway);
       currentPoint = halfway;
-      introTime += this.#timeBetweenDots;
+
       if (draw) {
+        introTime += this.#timeBetweenDots;
+        var that = this;
         setTimeout(
           function (point) {
-            ctx.beginPath();
-            ctx.fillStyle = dotColor;
-            ctx.arc(point.x, point.y, dotLineWidth, 0, Math.PI * 2, true);
-            ctx.fill();
+            that.#drawDot(point);
           },
           introTime,
-          points[i]
+          that.#points[count]
         );
       }
       count++;
     }
   }
+  #drawDot(point) {
+    this.#context.beginPath();
+    this.#context.fillStyle = this.#dotColor;
+    this.#context.arc(point.x, point.y, this.#dotWidth, 0, Math.PI * 2, true);
+    this.#context.fill();
+  }
+  resetCanvas(drawTriangle = true) {
+    this.#context.clearRect(0, 0, canvas.width, canvas.height);
+    this.#setTriangle();
+    if (withTriangle) {
+      this.#drawTriangle();
+    }
+  }
 }
-
-//window.CP.PenTimer.MAX_TIME_IN_LOOP_WO_EXIT = 6000;
 
 console.log("start");
 
-function drawTriangle() {
-  ctx.beginPath();
-  ctx.lineWidth = triLineWidth;
-  ctx.strokeStyle = dotColor;
-  ctx.moveTo(triangle.x1, triangle.y1);
-  ctx.lineTo(triangle.x2, triangle.y2);
-  ctx.lineTo(triangle.x3, triangle.y3);
-  ctx.lineTo(triangle.x1, triangle.y1);
-  ctx.stroke();
-  ctx.closePath();
-}
-function resetCanvas() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  setTriangle();
-  drawTriangle();
-}
+let st = new SierpinskiTriangle("c", true, true);
 
-resetCanvas();
-
-setTriangle();
-drawTriangle();
 document
   .getElementsByClassName("panel-item start")[0]
   .addEventListener("click", function () {
