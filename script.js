@@ -196,7 +196,7 @@ class SierpinskiTriangle {
 
 console.log("start");
 
-let st = new SierpinskiTriangle("c", true, true);
+let st = new SierpinskiTriangle();
 
 document
   .getElementsByClassName("panel-item start")[0]
@@ -204,6 +204,5 @@ document
     st.resetCanvas();
     console.log("Start button clicked");
     st.startChaosGame();
-    drawChaosGame();
-    console.log(iterations + "Iterations Completed");
+    console.log(finished);
   });
